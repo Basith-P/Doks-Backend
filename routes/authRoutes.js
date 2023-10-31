@@ -1,5 +1,8 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
+
 const User = require("../models/user");
+const auth = require("../middlewears/auth_middlewear");
 
 const authRouter = express.Router();
 
@@ -11,12 +14,26 @@ authRouter.post("/register", async (req, res) => {
 
   try {
     let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ msg: "User already exists!" });
+    if (!user) {
+      user = User({ name, email, profilePic });
+      await user.save();
+    }
 
-    user = User({ name, email, profilePic });
-    await user.save();
-    res.status(201).json({ message: "User created successfully!", user });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+
+    res.json({ user, token });
   } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+authRouter.get("/", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+    res.json({ user, token: req.token });
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 });
