@@ -28,7 +28,7 @@ authRouter.post("/register", async (req, res) => {
   }
 });
 
-authRouter.get("/", auth, async (req, res) => {
+authRouter.get("/user", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user);
     res.json({ user, token: req.token });
