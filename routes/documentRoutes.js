@@ -33,7 +33,6 @@ documentRouter.get("/:id", auth, async (req, res) => {
     if (!document) {
       return res.status(404).json({ error: "Document not found" });
     }
-    console.log(document);
     res.json(document);
   } catch (err) {
     console.log(err);

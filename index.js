@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require("http");
 
 const authRoutes = require("./routes/authRoutes");
 const documentRoutes = require("./routes/documentRoutes");
@@ -10,6 +11,8 @@ require("dotenv").config();
 const PORT = process.env.PORT || 3001;
 
 const app = express();
+const server = http.createServer(app);
+const io = require("socket.io")(server);
 
 /// Middleware
 app.use(cors());
@@ -25,6 +28,14 @@ mongoose
   .then(() => console.log("DB Connected"))
   .catch((err) => console.log(err));
 
-app.listen(PORT, "0.0.0.0", () => {
+io.on("connection", (socket) => {
+  console.log("a user connected");
+  socket.on("joinRoom", (documentId) => {
+    socket.join(documentId);
+    console.log("joined room");
+  });
+});
+
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`App running on port ${PORT}!`);
 });
