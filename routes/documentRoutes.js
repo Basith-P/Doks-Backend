@@ -27,6 +27,20 @@ documentRouter.post("/", auth, async (req, res) => {
   }
 });
 
+documentRouter.get("/:id", auth, async (req, res) => {
+  try {
+    const document = await Document.findById(req.params.id);
+    if (!document) {
+      return res.status(404).json({ error: "Document not found" });
+    }
+    console.log(document);
+    res.json(document);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 documentRouter.put("/:id/title", auth, async (req, res) => {
   const id = req.params.id;
   const { title } = req.body;
